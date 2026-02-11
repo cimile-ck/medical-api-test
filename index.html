@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>의료기관 상세 정보</title>
+</head>
+<body>
+  <h2>의료기관 상세 정보 API 테스트</h2>
+
+  <label>
+    요양기호 (ykiho, 암호화된 ID):
+    <input id="ykiho" size="40" placeholder="예: 암호화된 요양기호" />
+  </label>
+  <button onclick="fetchEqpInfo()">조회</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    async function fetchEqpInfo() {
+      const ykiho = document.getElementById('ykiho').value.trim();
+      if (!ykiho) {
+        alert('먼저 ykiho 값을 입력하세요');
+        return;
+      }
+
+      const serviceKey = 'e9f3047f7e5ebdf44375f370d8d2b8be3bbb6d4ebb775af0e5f9b99acf1832db'; // 발급받은 서비스키를 문자열로 입력
+
+      const url = new URL('https://apis.data.go.kr/B551182/MadmDtlInfoService2.7/getEqpInfo2.7');
+      url.searchParams.append('serviceKey', serviceKey);
+      url.searchParams.append('ykiho', ykiho);
+      url.searchParams.append('pageNo', 1);
+      url.searchParams.append('numOfRows', 10);
+      url.searchParams.append('_type', 'json'); // JSON 응답 요청
+
+      try {
+        const response = await fetch(url.toString());
+        if (!response.ok) {
+          throw new Error('HTTP error: ' + response.status);
+        }
+        const data = await response.json();
+        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('output').textContent = 'Error: ' + err;
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
